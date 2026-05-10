@@ -1,12 +1,12 @@
 {
   "name": "finedge-dashboard",
   "version": "1.0.0",
-  "description": "FinEdge Dashboard - Financial Analytics Platform",
+  "description": "FinEdge Dashboard - Financial Analytics & Reporting Platform",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd server && npm run dev",
-    "client": "cd client && PORT=3000 npm start",
-    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "start": "cd client && npm start",
+    "server": "cd server && node index.js",
+    "dev": "concurrently \"npm run server\" \"npm start\"",
+    "install-all": "cd server && npm install && cd ../client && npm install",
     "build": "cd client && npm run build"
   },
   "devDependencies": {

@@ -13,18 +13,14 @@ function App() {
     if (token) setIsLoggedIn(true);
   }, []);
 
-  console.log('App rendered, isLoggedIn:', isLoggedIn); // Debug
-
   return (
     <ThemeProvider>
       <Router>
-        <div className="app">
-          <Routes>
-            <Route path="/login" element={<Login onLogin={() => setIsLoggedIn(true)} />} />
-            <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />} />
-            <Route path="/" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/login" element={<Login onLogin={() => setIsLoggedIn(true)} />} />
+          <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+        </Routes>
       </Router>
     </ThemeProvider>
   );
