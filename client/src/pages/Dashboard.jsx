@@ -8,6 +8,7 @@ import {
   Sun, Moon, LogOut, Menu,
   CreditCard, ArrowUpRight, ArrowDownRight, BarChart3
 } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, PieChart as RePieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import Portfolio from './Portfolio';
 import Transactions from './Transactions';
 import Goals from './Goals';
@@ -20,6 +21,7 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [notifications] = useState(3);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleLogout = () => {
@@ -29,6 +31,40 @@ const Dashboard = () => {
   };
 
   const t = theme === 'dark';
+
+  // Sample data for charts
+  const revenueData = [
+    { month: 'Jan', revenue: 42000, expenses: 32000, profit: 10000 },
+    { month: 'Feb', revenue: 45000, expenses: 33000, profit: 12000 },
+    { month: 'Mar', revenue: 40000, expenses: 31000, profit: 9000 },
+    { month: 'Apr', revenue: 48000, expenses: 35000, profit: 13000 },
+    { month: 'May', revenue: 52000, expenses: 37000, profit: 15000 },
+    { month: 'Jun', revenue: 50000, expenses: 36000, profit: 14000 },
+  ];
+
+  const categoryData = [
+    { name: 'Housing', value: 15000, color: '#3B82F6' },
+    { name: 'Food', value: 8000, color: '#10B981' },
+    { name: 'Transport', value: 4000, color: '#F59E0B' },
+    { name: 'Entertainment', value: 3000, color: '#EF4444' },
+    { name: 'Utilities', value: 2500, color: '#8B5CF6' },
+    { name: 'Healthcare', value: 2000, color: '#EC4899' },
+  ];
+
+  const portfolioData = [
+    { month: 'Jan', value: 35000 },
+    { month: 'Feb', value: 38000 },
+    { month: 'Mar', value: 36000 },
+    { month: 'Apr', value: 42000 },
+    { month: 'May', value: 45000 },
+    { month: 'Jun', value: 45000 },
+  ];
+
+  const notificationsList = [
+    { id: 1, title: 'Salary Deposited', message: '$5,000 credited to your account', time: '2 hours ago', type: 'success' },
+    { id: 2, title: 'Bill Due Soon', message: 'Office rent payment due in 3 days', time: '5 hours ago', type: 'warning' },
+    { id: 3, title: 'Goal Achieved!', message: 'You reached 75% of your savings goal', time: '1 day ago', type: 'info' },
+  ];
 
   const styles = {
     container: {
@@ -84,33 +120,19 @@ const Dashboard = () => {
     { title: 'Investments', value: '$45,000', change: '+15.3%', icon: <Activity size={24} />, color: '#8B5CF6', bgColor: '#EDE9FE' },
   ];
 
-  const transactionData = [
-    { desc: 'Salary Deposit', cat: 'Income', amount: '+$5,000', color: '#10B981', date: 'Jan 15, 2024', status: 'Completed', icon: <ArrowUpRight size={16} /> },
-    { desc: 'Office Rent', cat: 'Expense', amount: '-$2,000', color: '#EF4444', date: 'Jan 14, 2024', status: 'Completed', icon: <ArrowDownRight size={16} /> },
-    { desc: 'Internet Bill', cat: 'Utilities', amount: '-$299', color: '#EF4444', date: 'Jan 13, 2024', status: 'Pending', icon: <ArrowDownRight size={16} /> },
-    { desc: 'Freelance Project', cat: 'Income', amount: '+$1,500', color: '#10B981', date: 'Jan 12, 2024', status: 'Completed', icon: <ArrowUpRight size={16} /> },
-    { desc: 'Marketing Ads', cat: 'Marketing', amount: '-$750', color: '#EF4444', date: 'Jan 11, 2024', status: 'Failed', icon: <ArrowDownRight size={16} /> },
-  ];
-
   const renderContent = () => {
     switch(activeTab) {
-      case 'portfolio':
-        return <Portfolio theme={theme} />;
-      case 'transactions':
-        return <Transactions theme={theme} />;
-      case 'goals':
-        return <Goals theme={theme} />;
-      case 'calendar':
-        return <CalendarView theme={theme} />;
-      case 'reports':
-        return <Reports theme={theme} />;
-      default:
-        return renderOverview();
+      case 'portfolio': return <Portfolio theme={theme} />;
+      case 'transactions': return <Transactions theme={theme} />;
+      case 'goals': return <Goals theme={theme} />;
+      case 'calendar': return <CalendarView theme={theme} />;
+      case 'reports': return <Reports theme={theme} />;
+      default: return renderOverview();
     }
   };
 
   const renderOverview = () => (
-    <>
+    <div className="fade-in">
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: t ? '#F9FAFB' : '#111827', margin: '0 0 0.5rem 0' }}>
           Welcome back, Demo User! 👋
@@ -144,58 +166,113 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Transactions Table */}
-      <div style={{ backgroundColor: t ? '#1F2937' : '#FFFFFF', padding: '1.5rem', borderRadius: '16px', border: `1px solid ${t ? '#374151' : '#E5E7EB'}` }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: t ? '#F9FAFB' : '#111827', margin: 0 }}>Recent Transactions</h2>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button onClick={() => setActiveTab('transactions')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', border: `1px solid ${t ? '#374151' : '#E5E7EB'}`, borderRadius: '8px', background: 'transparent', color: '#6B7280', cursor: 'pointer', fontWeight: 500, fontFamily: 'inherit' }}>
-              <Filter size={16} /> Filter
-            </button>
-            <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', border: 'none', borderRadius: '8px', background: '#3B82F6', color: 'white', cursor: 'pointer', fontWeight: 500, fontFamily: 'inherit' }}>
-              <Download size={16} /> Export
-            </button>
-            <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', border: 'none', borderRadius: '8px', background: '#10B981', color: 'white', cursor: 'pointer', fontWeight: 500, fontFamily: 'inherit' }}>
-              <Plus size={16} /> Add New
-            </button>
-          </div>
+      {/* Charts Section */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+        {/* Revenue vs Expenses Chart */}
+        <div style={{ backgroundColor: t ? '#1F2937' : '#FFFFFF', padding: '1.5rem', borderRadius: '16px', border: `1px solid ${t ? '#374151' : '#E5E7EB'}` }}>
+          <h3 style={{ color: t ? '#F9FAFB' : '#111827', margin: '0 0 1.5rem 0', fontSize: '1.1rem', fontWeight: 600 }}>
+            📈 Revenue vs Expenses
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={revenueData}>
+              <CartesianGrid strokeDasharray="3 3" stroke={t ? '#374151' : '#E5E7EB'} />
+              <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
+              <YAxis stroke="#6B7280" fontSize={12} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: t ? '#1F2937' : '#FFFFFF',
+                  border: `1px solid ${t ? '#374151' : '#E5E7EB'}`,
+                  borderRadius: '8px',
+                  color: t ? '#F9FAFB' : '#111827'
+                }}
+              />
+              <Area type="monotone" dataKey="revenue" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={2} />
+              <Area type="monotone" dataKey="expenses" stroke="#EF4444" fill="#EF4444" fillOpacity={0.1} strokeWidth={2} />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ borderBottom: `1px solid ${t ? '#374151' : '#E5E7EB'}` }}>
-              <th style={thStyle}>Transaction</th>
-              <th style={thStyle}>Category</th>
-              <th style={{ ...thStyle, textAlign: 'right' }}>Amount</th>
-              <th style={{ ...thStyle, textAlign: 'right' }}>Date</th>
-              <th style={{ ...thStyle, textAlign: 'center' }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactionData.map((tx, i) => (
-              <tr key={i} style={{ borderBottom: `1px solid ${t ? '#374151' : '#F3F4F6'}` }}>
-                <td style={tdStyle}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: tx.amount.startsWith('+') ? '#D1FAE5' : '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', color: tx.color }}>
-                      {tx.icon}
-                    </div>
-                    <span style={{ fontWeight: 500, color: t ? '#F9FAFB' : '#111827' }}>{tx.desc}</span>
-                  </div>
-                </td>
-                <td style={{ ...tdStyle, color: '#6B7280' }}>{tx.cat}</td>
-                <td style={{ ...tdStyle, textAlign: 'right', fontWeight: 600, color: tx.color }}>{tx.amount}</td>
-                <td style={{ ...tdStyle, textAlign: 'right', color: '#6B7280' }}>{tx.date}</td>
-                <td style={{ ...tdStyle, textAlign: 'center' }}>
-                  <span style={{ padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, backgroundColor: tx.status === 'Completed' ? '#D1FAE5' : tx.status === 'Pending' ? '#FEF3C7' : '#FEE2E2', color: tx.status === 'Completed' ? '#059669' : tx.status === 'Pending' ? '#D97706' : '#DC2626' }}>
-                    {tx.status}
-                  </span>
-                </td>
-              </tr>
+        {/* Portfolio Growth */}
+        <div style={{ backgroundColor: t ? '#1F2937' : '#FFFFFF', padding: '1.5rem', borderRadius: '16px', border: `1px solid ${t ? '#374151' : '#E5E7EB'}` }}>
+          <h3 style={{ color: t ? '#F9FAFB' : '#111827', margin: '0 0 1.5rem 0', fontSize: '1.1rem', fontWeight: 600 }}>
+            📊 Portfolio Growth
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={portfolioData}>
+              <CartesianGrid strokeDasharray="3 3" stroke={t ? '#374151' : '#E5E7EB'} />
+              <XAxis dataKey="month" stroke="#6B7280" fontSize={12} />
+              <YAxis stroke="#6B7280" fontSize={12} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: t ? '#1F2937' : '#FFFFFF',
+                  border: `1px solid ${t ? '#374151' : '#E5E7EB'}`,
+                  borderRadius: '8px',
+                  color: t ? '#F9FAFB' : '#111827'
+                }}
+              />
+              <Bar dataKey="value" fill="#3B82F6" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Expense Breakdown */}
+        <div style={{ backgroundColor: t ? '#1F2937' : '#FFFFFF', padding: '1.5rem', borderRadius: '16px', border: `1px solid ${t ? '#374151' : '#E5E7EB'}` }}>
+          <h3 style={{ color: t ? '#F9FAFB' : '#111827', margin: '0 0 1.5rem 0', fontSize: '1.1rem', fontWeight: 600 }}>
+            🍩 Expense Breakdown
+          </h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <RePieChart>
+              <Pie
+                data={categoryData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {categoryData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: t ? '#1F2937' : '#FFFFFF',
+                  border: `1px solid ${t ? '#374151' : '#E5E7EB'}`,
+                  borderRadius: '8px',
+                  color: t ? '#F9FAFB' : '#111827'
+                }}
+              />
+              <Legend />
+            </RePieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Quick Insights */}
+        <div style={{ backgroundColor: t ? '#1F2937' : '#FFFFFF', padding: '1.5rem', borderRadius: '16px', border: `1px solid ${t ? '#374151' : '#E5E7EB'}` }}>
+          <h3 style={{ color: t ? '#F9FAFB' : '#111827', margin: '0 0 1.5rem 0', fontSize: '1.1rem', fontWeight: 600 }}>
+            💡 AI Insights
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {[
+              { icon: '📈', text: 'Revenue is up 12.5% - best quarter yet!', color: '#10B981' },
+              { icon: '⚠️', text: 'Marketing expenses exceeded budget by 15%', color: '#F59E0B' },
+              { icon: '💡', text: 'You could save $2,500 by switching suppliers', color: '#3B82F6' },
+              { icon: '🎯', text: '85% of quarterly goals achieved', color: '#8B5CF6' },
+            ].map((insight, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: '0.75rem',
+                padding: '0.75rem', borderRadius: '10px',
+                backgroundColor: t ? '#374151' : '#F9FAFB'
+              }}>
+                <span style={{ fontSize: '1.5rem' }}>{insight.icon}</span>
+                <p style={{ color: t ? '#F9FAFB' : '#111827', margin: 0, fontSize: '0.9rem' }}>{insight.text}</p>
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 
   return (
@@ -230,6 +307,17 @@ const Dashboard = () => {
               >
                 {item.icon}
                 <span>{item.label}</span>
+                {item.id === 'transactions' && (
+                  <span style={{
+                    marginLeft: 'auto',
+                    background: '#3B82F6',
+                    color: 'white',
+                    padding: '0.15rem 0.5rem',
+                    borderRadius: '10px',
+                    fontSize: '0.7rem',
+                    fontWeight: 600
+                  }}>5</span>
+                )}
               </button>
             ))}
           </nav>
@@ -238,7 +326,6 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <div style={styles.mainContent}>
-        {/* Header */}
         <header style={styles.header}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: t ? '#9CA3AF' : '#6B7280' }}>
@@ -246,23 +333,60 @@ const Dashboard = () => {
             </button>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', backgroundColor: t ? '#374151' : '#F9FAFB', borderRadius: '10px', border: `1px solid ${t ? '#4B5563' : '#E5E7EB'}` }}>
               <Search size={16} color="#9CA3AF" />
-              <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ border: 'none', background: 'none', outline: 'none', color: t ? '#F9FAFB' : '#111827', width: '200px', fontFamily: 'inherit' }} />
+              <input type="text" placeholder="Search transactions, reports..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ border: 'none', background: 'none', outline: 'none', color: t ? '#F9FAFB' : '#111827', width: '250px', fontFamily: 'inherit' }} />
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button onClick={toggleTheme} style={{ padding: '0.5rem', borderRadius: '8px', border: `1px solid ${t ? '#4B5563' : '#E5E7EB'}`, background: t ? '#374151' : '#FFFFFF', cursor: 'pointer', color: t ? '#F9FAFB' : '#6B7280' }}>
+            <button onClick={toggleTheme} style={{ padding: '0.5rem', borderRadius: '8px', border: `1px solid ${t ? '#4B5563' : '#E5E7EB'}`, background: t ? '#374151' : '#FFFFFF', cursor: 'pointer', color: t ? '#F9FAFB' : '#6B7280', position: 'relative' }}>
               {t ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            <button onClick={() => alert(`You have ${notifications} new notifications!`)} style={{ padding: '0.5rem', borderRadius: '8px', position: 'relative', border: `1px solid ${t ? '#4B5563' : '#E5E7EB'}`, background: t ? '#374151' : '#FFFFFF', cursor: 'pointer', color: t ? '#F9FAFB' : '#6B7280' }}>
-              <Bell size={18} />
-              {notifications > 0 && (
-                <span style={{ position: 'absolute', top: '-4px', right: '-4px', width: '20px', height: '20px', background: '#EF4444', color: 'white', fontSize: '0.7rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
-                  {notifications}
-                </span>
+            <div style={{ position: 'relative' }}>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                style={{ padding: '0.5rem', borderRadius: '8px', position: 'relative', border: `1px solid ${t ? '#4B5563' : '#E5E7EB'}`, background: t ? '#374151' : '#FFFFFF', cursor: 'pointer', color: t ? '#F9FAFB' : '#6B7280' }}
+              >
+                <Bell size={18} />
+                {notifications > 0 && (
+                  <span style={{ position: 'absolute', top: '-4px', right: '-4px', width: '20px', height: '20px', background: '#EF4444', color: 'white', fontSize: '0.7rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+                    {notifications}
+                  </span>
+                )}
+              </button>
+              
+              {showNotifications && (
+                <div style={{
+                  position: 'absolute', top: '100%', right: 0,
+                  marginTop: '0.5rem', width: '320px',
+                  backgroundColor: t ? '#1F2937' : '#FFFFFF',
+                  borderRadius: '12px',
+                  border: `1px solid ${t ? '#374151' : '#E5E7EB'}`,
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+                  zIndex: 1000,
+                  overflow: 'hidden'
+                }}>
+                  <div style={{ padding: '1rem', borderBottom: `1px solid ${t ? '#374151' : '#E5E7EB'}` }}>
+                    <h4 style={{ margin: 0, color: t ? '#F9FAFB' : '#111827' }}>Notifications</h4>
+                  </div>
+                  {notificationsList.map((notif) => (
+                    <div key={notif.id} style={{
+                      padding: '0.75rem 1rem',
+                      borderBottom: `1px solid ${t ? '#374151' : '#F3F4F6'}`,
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = t ? '#374151' : '#F9FAFB'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <p style={{ margin: '0 0 0.25rem 0', fontWeight: 600, color: t ? '#F9FAFB' : '#111827', fontSize: '0.9rem' }}>{notif.title}</p>
+                      <p style={{ margin: '0 0 0.25rem 0', color: '#6B7280', fontSize: '0.85rem' }}>{notif.message}</p>
+                      <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{notif.time}</span>
+                    </div>
+                  ))}
+                </div>
               )}
-            </button>
+            </div>
 
             <button onClick={handleLogout} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', background: '#EF4444', color: 'white', cursor: 'pointer', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'inherit' }}>
               <LogOut size={16} /> Logout
@@ -270,7 +394,6 @@ const Dashboard = () => {
           </div>
         </header>
 
-        {/* Content Area */}
         <main style={{ padding: '2rem' }}>
           {renderContent()}
         </main>
@@ -278,8 +401,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
-const thStyle = { padding: '0.75rem', textAlign: 'left', fontSize: '0.8rem', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase' };
-const tdStyle = { padding: '1rem 0.75rem', fontSize: '0.9rem' };
 
 export default Dashboard;
